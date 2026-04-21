@@ -275,12 +275,11 @@ sum((allages+0.5)*d.x) / sum(d.x) ## 69.86
 \newline \newline A:
 The data only records the curtate lifetime $K_i = \lfloor X_i \rfloor$, the integer part of the true age-at-death. A person recorded as dying at age $x$ actually died somewhere in the interval $[x,x+1)$. 
 Assuming deaths are roughly uniformly distributed within each year of age, the best estimate of the actual age-at-death for such a person is the midpoint $x+0.5$. 
-Using just $x$ would systematically underestimate all ages-at-death by about half a year.
 
 (b) The expected age-at-death estimated via the sample average (69.86) is somewhat lower than the expected age-at-death estimated via the fitted Makeham distribution (72.05). Can you guess why that is the case?
 \newline \newline A: 
 The Makeham model was fitted ignoring the ages $x=0,1,2$, because those early deaths are driven by infant mortality rather than the Makeham mechanism. 
-The Makeham distribution therefore does not account for the infant deaths that pull the sample mean down. The Makeham estimate of $\mathbb{E}[X]$ effectively models the lifetime of someone not subject to infant mortality, and thus higher than the raw sample average.
+The Makeham distribution therefore does not account for the infant deaths that pull the sample mean down.
 
 \newpage
 Next, we turn to the problem of estimating the expected number of pension years after age 65 for people born in 1899. For example, the \texttt{d.x[66]} = 2\,253 people who died at age 65 (that is, somewhere between their 65th and 66th birthdays) had on average one half pension year. Similarly, the \texttt{d.x[67]} = 2\,483 people who died at age 66 enjoyed an average of 1.5 pension years, etc. Anybody who died before reaching the age of 65 had zero pension years. So we can make a vector counting the number of pension years for each age-at-death, and compute the sample mean of pension years as follows:
@@ -319,7 +318,8 @@ output:
 (b) Now estimate the expected number of pension years $\mathbb{E}[X - 65 \mid X > 65]$ for a person with age-at-death $X \sim \text{Makeham}(\hat{a}, \hat{b}, \hat{c})$, conditional on this person reaching the age of 65. (Hint: since this person is known to exceed the age of 65, his/her survival function is $S_X(x)/S_X(65)$, for $x > 65$. We have seen before Q4 how to compute the expected value from the survival function.)
 \newline \newline A:
 \begin{verbatim}
-makeham_cond <- integrate(sMakeham, 65, Inf, a.hat, b.hat, c.hat)$value / sMakeham(65, a.hat, b.hat, c.hat)
+makeham_cond <- 
+    integrate(sMakeham, 65, Inf, a.hat, b.hat, c.hat)$value / sMakeham(65, a.hat, b.hat, c.hat)
 
 Output:
 > makeham_cond
