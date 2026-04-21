@@ -272,15 +272,15 @@ sum((allages+0.5)*d.x) / sum(d.x) ## 69.86
 \end{verbatim}
 \newpage
 \item[$\boldsymbol{Q_4}$] (a) Why is it reasonable to use \texttt{allages+0.5} rather than \texttt{allages} in the last computation?
-\newline \newline A: The ages-at-death in the sample are given as integers, which represent the number of full years lived. 
-For example, if someone died at age 65, it means they lived through their 65th birthday but did not reach their 66th birthday. 
-Therefore, the actual age-at-death for someone recorded as dying at age $x$ is somewhere between $x$ and $x+1$. 
-By adding 0.5 to each integer age, we are effectively estimating the average age-at-death for those who died at that age, assuming a uniform distribution of deaths within each year. 
-This provides a more accurate estimate of the expected age-at-death than simply using the integer values.
+\newline \newline A:
+The data only records the curtate lifetime $K_i = \lfloor X_i \rfloor$, the integer part of the true age-at-death. A person recorded as dying at age $x$ actually died somewhere in the interval $[x,x+1)$. 
+Assuming deaths are roughly uniformly distributed within each year of age, the best estimate of the actual age-at-death for such a person is the midpoint $x+0.5$. 
+Using just $x$ would systematically underestimate all ages-at-death by about half a year.
 
 (b) The expected age-at-death estimated via the sample average (69.86) is somewhat lower than the expected age-at-death estimated via the fitted Makeham distribution (72.05). Can you guess why that is the case?
 \newline \newline A: 
-
+The Makeham model was fitted ignoring the ages $x=0,1,2$, because those early deaths are driven by infant mortality rather than the Makeham mechanism. 
+The Makeham distribution therefore does not account for the infant deaths that pull the sample mean down. The Makeham estimate of $\mathbb{E}[X]$ effectively models the lifetime of someone not subject to infant mortality, and thus higher than the raw sample average.
 
 \newpage
 Next, we turn to the problem of estimating the expected number of pension years after age 65 for people born in 1899. For example, the \texttt{d.x[66]} = 2\,253 people who died at age 65 (that is, somewhere between their 65th and 66th birthdays) had on average one half pension year. Similarly, the \texttt{d.x[67]} = 2\,483 people who died at age 66 enjoyed an average of 1.5 pension years, etc. Anybody who died before reaching the age of 65 had zero pension years. So we can make a vector counting the number of pension years for each age-at-death, and compute the sample mean of pension years as follows:
@@ -300,6 +300,8 @@ output:
 > exp_pension
 [1] 8.898422
 \end{verbatim}
+Since $S_X(x)$ is larger under the Makeham model than the true empirical survival function (which is pulled down by infant deaths), the integral $\int_{65}^\infty S_X(x)\,dx$ is also larger, yielding a higher estimated expected pension duration.
+
 
 
 \newpage
@@ -326,7 +328,10 @@ Output:
 
 (c) You should see that the Makeham estimate in part (b) of the expected number of pension years for people surviving up to age 65 is quite close to the corresponding sample estimate in (a), even though the Makeham estimate in Q5 of the expected number of pension years for everybody was higher than the corresponding sample estimate. Can you explain why this is the case?
 \newline \newline A:
-
+When computing $\mathbb{E}[(X-65)_+]$ for the whole population, the comparison includes everyone.
+The Makeham model ignores those early deaths and thus overestimates the probability of surviving to old age for the full cohort, causing it to give a higher value than the sample.
+However, when we condition on $X>65$, we restrict attention to people who actually survived past 65. 
+At this point, the infant deaths are already "filtered" out of both the sample and the model.
 
 
 \newpage
@@ -336,6 +341,14 @@ It is sometimes claimed that because of smoking, mortality rates are multiplied 
 
 \item[$\boldsymbol{Q_7}$] Let $X$ be a random variable denoting the lifetime (or age-at-death) of a person, with corresponding mortality rate $\mu_X(x)$ and survival function $S_X(x)$. Note that we are not assuming $X$ to be Makeham. Suppose the mortality rate $\mu_X$ gets multiplied by a factor $f$ (perhaps due to smoking) to yield a new mortality rate $\mu_X^{\text{new}}(x) = f \cdot \mu_X(x)$. Use equation (3) to express the new survival function $S_X^{\text{new}}(x)$ in terms of the original survival function $S_X(x)$.
 \newline \newline A:
+
+Starting from equation (3), the original survival function satisfies:
+\[S_X(x) = \exp\!\left(-\int_0^x \mu_X(t)\,dt\right)\]
+With the new mortality rate \[ \mu_X^{\text{new}}(x) = f \cdot \mu_X(x)\], 
+the new survival function is:
+\[S_X^{\text{new}}(x) = \exp\!\left(-\int_0^x f\cdot\mu_X(t)\,dt\right) = \exp\!\left(-f\int_0^x \mu_X(t)\,dt\right) = \left[S_X(x)\right]^f\]
+So multiplying the mortality rate by a factor $f$ simply raises the survival function to the power $f$.
+
 
 
 \newpage
@@ -356,8 +369,9 @@ exp.lifetimes <- sapply(f_vals, function(f) {
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.5\textwidth]{Q8b.png}
-\caption{Expected age-at-death as a function of $k$, where $f = 2^k$ is the factor by which the mortality rate is multiplied.}
+\caption{Expected age-at-death as a function of $k$, where $f = 2^k$.}
 \end{figure}
+This drop is approximately 6 years per doubling of the mortality rate.
 
 \newpage
 \section{Reducing Makeham's law to Gompertz'}
@@ -415,6 +429,7 @@ legend("topleft", legend = c("Observed (dx/100k)", "Makeham Fit", "Gompertz Fit"
 \includegraphics[width=0.5\textwidth]{Q9b.png}
 \caption{Observed fractions of deaths at each age, together with fitted Makeham and Gompertz densities.}
 \end{figure}
+From the plot, it appears that the Makeham density (red line) fits the data better than the Gompertz density (blue dashed line), especially at younger ages.
 
 \newpage
 (c) One possible way of comparing the fit of two parametric models for a given dataset is the Akaike Information Criterion, or AIC for short. The AIC for a parametric model is defined as $2k - 2\ell$, where $k$ is the number of parameters estimated in the model (3 for Makeham, 2 for Gompertz), and $\ell$ is the maximized value of the log-likelihood function for the estimated model. According to statistical theory, the model with the lower AIC value provides a better fit to the dataset. Note that this method ``rewards'' a high likelihood, but ``penalizes'' the use of too many parameters.
