@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1776722316.72818 "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 2/main.tex" "main.pdf" "main" 1776722317.43281 0
-  "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 2/main.tex" 1776722316.62378 26010 ea60c8e4eff8e9d04655f796ff14f1a4 ""
+["pdflatex"] 1776750601.60265 "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 2/main.tex" "main.pdf" "main" 1776750602.9556 0
+  "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 2/main.tex" 1776750600.02714 26032 47f59af6dce0b6d67905cb1327e2e2ac ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1136768653 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -109,6 +109,10 @@
   "/usr/local/texlive/2026/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty" 1665067230 13815 760b0c02f691ea230f5359c4e1de23a7 ""
   "/usr/local/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def" 1761248321 30662 bfd6e864f4ffc5018b0e2b6260c3181c ""
   "/usr/local/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg" 1279039959 678 4792914a8f45be57bb98413425e4c7af ""
+  "/usr/local/texlive/2026/texmf-dist/tex/latex/listings/listings.cfg" 1763671178 1865 73df61e45e2dfdc239ef37ab16d87d6a ""
+  "/usr/local/texlive/2026/texmf-dist/tex/latex/listings/listings.sty" 1763671178 81627 6a9c17f89f356724d1c9813b7025f0c1 ""
+  "/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstmisc.sty" 1763671178 77105 002e983b638eadbf04e580642335f689 ""
+  "/usr/local/texlive/2026/texmf-dist/tex/latex/listings/lstpatch.sty" 1710360531 353 9024412f43e92cd5b21fe9ded82d0610 ""
   "/usr/local/texlive/2026/texmf-dist/tex/latex/refcount/refcount.sty" 1576624809 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "/usr/local/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1750533675 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
   "/usr/local/texlive/2026/texmf-dist/tex/latex/setspace/setspace.sty" 1670275497 22490 8cac309b79a4c53a4ffce4b1b07aead0 ""
@@ -123,9 +127,9 @@
   "Q8b.png" 1776721537.81122 72665 1641819dc165742bd69512683bab4da1 ""
   "Q9b.png" 1776722096.10841 125384 45c50c7e9302b1257a4d3d3de41d9b8a ""
   "logo.jpg" 1776716987.69489 235496 6c192f001d4525434ed8d32af8b5497b ""
-  "main.aux" 1776722317.38309 1589 e70af3253c91c56b8697346b73f35199 "pdflatex"
-  "main.out" 1776722317.3834 1407 e5fd31a63b952a21ead74ebd065a1985 "pdflatex"
-  "main.tex" 1776722316.62378 26010 ea60c8e4eff8e9d04655f796ff14f1a4 ""
+  "main.aux" 1776750602.87256 1589 1f820cbee18b08d2b13dc2f16e9b2a78 "pdflatex"
+  "main.out" 1776750602.87319 1407 e5fd31a63b952a21ead74ebd065a1985 "pdflatex"
+  "main.tex" 1776750600.02714 26032 47f59af6dce0b6d67905cb1327e2e2ac ""
   (generated)
   "main.aux"
   "main.log"
