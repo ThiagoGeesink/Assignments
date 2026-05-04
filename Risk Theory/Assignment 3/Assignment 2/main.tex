@@ -1,0 +1,267 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry} 
+\usepackage{setspace} 
+\onehalfspacing
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\fancyhead[LO]{\small{\textit{Risk Theory: Assignment 3}}}
+
+\title{\textbf{Risk Theory 2025/26\\Assignment 3}\\[0.5em]
+\textbf{Probability of big loss ratios via approximations}}
+\author{
+    Geesink, T. \\
+    \texttt{14124165}
+    }
+    
+    
+\date{May 2026}
+
+\begin{document}
+    \pagestyle{fancy}
+\includegraphics[scale=0.2]{logo.jpg}
+\begingroup
+{\let\newpage\relax\maketitle}
+\maketitle
+\endgroup 
+
+\clearpage
+
+For a certain branch of an insurance company, weekly \textit{loss ratios} were recorded, which are the total claims received each week divided by the total premium earned that week, as a rounded percentage. The total recording period was 100 weeks. Of course big loss ratios are a reason for concern for the risk management department. Based on these data, they want to estimate the probabilities of ``large'' and ``extreme'' loss ratios, and consider taking a stop-loss like reinsurance to cover the extreme loss ratios.
+
+\section{Estimating the cumulants}
+The 100 (rounded) observed loss ratios are stored, not in the order that they occurred but in increasing order, into a vector \texttt{X} like this:
+ 
+\begin{lstlisting}
+X <- scan(text="
+ 68  68  68  69  69  69  69  69  70  70  70  71  71  72  72  72  73  73  73
+ 73  74  74  74  74  74  75  75  76  76  76  77  78  78  79  80  80  81  81
+ 81  81  82  82  82  82  83  83  83  84  84  85  85  87  87  87  89  90  91
+ 91  91  92  92  92  92  92  93  93  94  95  97  97  97  97  98  98  98  98
+ 99 100 101 101 102 102 103 103 104 106 107 108 112 113 116 116 117 126 127
+132 132 149 158 170")
+\end{lstlisting}
+We assume that these numbers are i.i.d.\ observations from some random variable $X$ of unknown distribution. To be able to use the various approximations for this distribution, we first have to estimate the first three cumulants of the random variable $X$. These cumulants, as we have seen in the lectures, are the mean $\kappa_1 = \mu = \mathrm{E}[X]$, the variance $\kappa_2 = \sigma^2 = \mathrm{E}[(X-\mu)^2]$ and the third central moment $\kappa_3 = \mathrm{E}[(X-\mu)^3]$. We estimate these quantities from the data as follows:
+
+\begin{lstlisting}
+k1 <- mean(X); k2 <- mean((X-k1)^2); k3 <- mean((X-k1)^3)
+k1; k2; k3 ## 90 381.2 11841.6
+\end{lstlisting}
+
+With a sample size of $n = 100$ it does not make a lot of difference if we choose denominator $n$ for the sample variance, as we have done above, or $n-1$, as is done in the R-function \texttt{var}. The small sample correction of $n-1$ instead of $n$ is applied to obtain unbiased estimates. But using unbiased estimates for $\kappa_2$ and $\kappa_3$ does not necessarily mean that quantities like $\gamma$ (skewness of $X$) or $\Pr[X > x]$ or $\mathrm{E}[(X-d)_+]$ are estimated without bias. In any case, the simple method-of-moments estimators we use are consistent.
+
+\newpage
+\section{A histogram of the data}
+
+We plot a histogram of the sample $X$, and want to add a normal density with mean and variance equal to the estimated cumulants \texttt{k1} and \texttt{k2}.
+ 
+To be able to compare the histogram with the fitted density, we want to set the scale on the $y$-axis such that the total area of the bars in the histogram is equal to one. We do this by inserting a parameter \texttt{prob=TRUE} in the \texttt{hist()} call below. The graphical parameter \texttt{las=1} produces horizontal labels on the $y$-axis (see \texttt{?par}), and \texttt{col="gray85"} gives a light-gray color to the histogram bars. (Run \texttt{colors()} to see all the color possibilities.) The fitted density ranges over a wider interval than the data, therefore we let the $x$-values range from 40 to 180, and we ask for (about) 20 breaks in the histogram, leading to bars of width 5. We also suppress the $x$- and $y$-axis labels. The \texttt{curve()} call in the last line should produce the normal density curve with mean \texttt{k1} and variance \texttt{k2}. The argument \texttt{add=TRUE} ensures that the density curve is superimposed on the histogram, and \texttt{lwd=2} produces a thicker line.
+ 
+\begin{lstlisting}
+hist(X, prob=TRUE, las=1, col="gray85",
+     xlim=c(40,180), breaks=20, xlab="", ylab="") ## histogram of X
+curve(dnorm(...), add=TRUE, col="red", lwd=2)      ## add normal density
+\end{lstlisting}
+
+\begin{enumerate}
+  \item[$\boldsymbol{Q_1}$]
+    \begin{enumerate}
+      \item[(a)] Fill in the dots in the \texttt{curve()} call above, to add the fitted normal density to the histogram. (Hint: run \texttt{?curve} and \texttt{?dnorm} to figure out proper syntax.)
+      \item[(b)] Based on the plot, does it look like the random variable $X$ underlying the sample has a normal distribution?
+      \item[(c)] Apply the Jarque-Bera test for normality to the sample $X$. (Hint: see Q2 of Assignment 0.) Based on the result of this test, does it look like the random variable $X$ underlying this sample has a normal distribution? 
+  \end{enumerate}
+\end{enumerate}
+\newpage
+
+\section{Large loss ratios, normal approximation}
+Suppose that any loss ratio larger than 160\% is considered to be a large loss ratio by the insurer.
+\begin{enumerate}
+  \item [$\boldsymbol{Q_2}$]
+    \begin{enumerate}
+      \item[(a)] Use the normal approximation to estimate the probability $p$ that the loss ratio $X$ on any given week is 160\% or less. Use a correction for continuity, since the random variable $X$ is integer-valued but we approximate it with a continuous (normal) distribution. (That is, approximate the probability $\Pr[X \leq 160.5]$ rather than $\Pr[X \leq 160]$.)
+      \item[(b)] Assuming that $p$ in part (a) is the real probability of observing a loss ratio of 160\% or less, compute the probability that the maximum loss ratio in a sample of 100 loss ratios is 160\% or less. (In other words: compute the probability that all loss ratios in a sample of 100 are 160\% or less.) Note that in our sample $X$, the maximum loss ratio is above 160\%. Is this a likely occurrence according to the normal approximation? What does this tell you about the quality of the normal approximation in this case? 
+  \end{enumerate}
+\end{enumerate}
+
+\newpage
+\section{Large loss ratios, NP approximation}
+Judging from the normal approximation, a sample value of more than 160\% would be too rare to have reasonably occurred in our sample. Also, the histogram does not look like a normal density, exhibiting a highly asymmetric shape. Most likely, the normal power (NP) approximation will give us better results, since it takes the skewness of the underlying distribution into account.
+
+\begin{enumerate}
+  \item [$\boldsymbol{Q_3}$]
+    \begin{enumerate}
+      \item[(a)] Estimate the skewness $\gamma = \kappa_3/\kappa_2^{1.5}$ of $X$ from the sample $X$, store the skewness value as \texttt{gam}.
+      \item[(b)] Use the NP approximation, MART (2.60), to estimate the probability $p$ that the loss ratio $X$ on any given week is 160\% or less. Use a correction for continuity as in Q2.
+      \item[(c)] Assuming that $p$ in part (b) is the real probability of observing a loss ratio of 160\% or less, compute the probability that the maximum loss ratio in a sample of 100 loss ratios is 160\% or less. Is it now likely to observe a maximum observation exceeding 160\% in a sample of 100 loss ratios?
+  \end{enumerate}
+\end{enumerate}
+
+\newpage
+\section{Extreme loss ratios, translated gamma approximation}
+
+Suppose that any loss ratio larger than 170\% is considered to be an extreme loss ratio by the insurer. During the 100 weeks in our observation period, a loss ratio of over 170\% did not occur, but the probability of this event will no doubt be greater than zero. To give a better estimate than the normal approximation, we assume that the (unrounded) loss ratio $X$ has a translated gamma distribution, that is, $X \sim U + x_0$ with $U \sim \mathrm{gamma}(\alpha, \beta)$. To compute the parameters $x_0$, $\alpha$ and $\beta$, we will again use the sample cumulants \texttt{k1}, \texttt{k2} and \texttt{k3} as estimates for $\mu = \mathrm{E}[X]$, $\sigma^2 = \mathrm{Var}[X]$, and $\kappa_3 = \mathrm{E}[(X-\mu)^3]$.
+
+\begin{enumerate}
+  \item[$\boldsymbol{Q_4}$]
+    \begin{enumerate}
+      \item[] Fill in the dots in the script below to estimate the probability of a loss ratio exceeding 170\%. See (2.56) and (2.57) in MART. Use continuity correction as before. \\ \\
+      For the last line, you might want to consult \texttt{?dgamma}. Which of the four functions \texttt{dgamma}, \texttt{pgamma}, \texttt{qgamma} and \texttt{rgamma} do you need here?
+\begin{lstlisting}
+mu <- ...; sigma <- ...; gam <- ...
+alpha <- ...; beta <- ...; x0 <- ...
+1 - ...gamma(..., alpha, beta)  ## prob of loss ratio exceeding 170
+\end{lstlisting}
+\end{enumerate}
+\end{enumerate}
+
+\newpage
+\section{Translated gamma approximation in histogram}
+We want to see if the translated gamma approximation fits the dataset $X$ better than the normal. We do this by first writing a function to compute the translated gamma density and then adding a plot of this density to the histogram, just as we did for the normal case above.
+
+\begin{enumerate}
+  \item [$\boldsymbol{Q_5}$]
+    \begin{enumerate}
+      \item[] Fill in the dots in the script below, and discuss the resulting plot: which of the two approximations (normal and translated gamma) seems to fit the dataset better?
+\begin{lstlisting}
+hist(X, prob=TRUE, las=1, col="gray85",
+     xlim=c(40,180), breaks=20, xlab="", ylab="") ## histogram of X
+curve(dnorm(...), add=TRUE, col="red", lwd=2)      ## copy answer from Q1(a)
+dTransGam <- function(x) ...gamma(..., alpha, beta) ## tr. gamma density
+curve(dTransGam(x), add=TRUE, col="blue", lwd=2)   ## add tr. gamma to plot
+\end{lstlisting}
+  \end{enumerate}
+\end{enumerate}
+
+\newpage
+\section{A stop-loss insurance covering extreme loss ratios}
+To protect itself against extreme weekly losses, the insurer has found a reinsurer willing to pay $X - 170$ (in some monetary unit), if the loss ratio $X$ (in \%) exceeds 170. To find the net premium $\mathrm{E}[(X-170)_+]$ for this reinsurance, the corresponding sample quantity will not help, since a loss ratio above 170\% has not occurred up to now. Therefore we use a translated gamma approximation to find a net premium for this stop-loss reinsurance contract. As an aside, first we give some remarks on the use of a correction for continuity.
+ 
+In the figure below, we approximate the discrete cdf $F \sim \mathrm{Uniform}\{1,2,3,4\}$ by the continuous cdf $G \sim \mathrm{Uniform}(0.5, 4.5)$, which has the same expected value (2.5) as $F$. For approximating $F(k)$ at integer $k$ it seems better to use $G(k+0.5)$ rather than $G(k)$, which justifies the use of a continuity correction. However, for approximating the stop-loss premium of $F$ at e.g.\ $d = 2$ (gray area), it is better to compute the stop-loss premium of $G$ (triangular area above the red line) at argument $d = 2$ rather than $d = 2.5$. So when approximating stop-loss premiums, it is best not to use the correction for continuity.
+\begin{enumerate}
+  \item [$\boldsymbol{Q_6}$]
+    \begin{enumerate}
+      \item[(a)] Compute the net stop-loss premium $\mathrm{E}[(X-170)_+]$ using the translated gamma approximation and the formula (MART (1.33)):
+      \[
+        \mathrm{E}[(X-d)_+] = \int_d^{\infty} \bigl[1 - F_X(x)\bigr]\,\mathrm{d}x.
+      \]
+      (\textit{Hint}: Write a function \texttt{sg} that computes the integrand $1-F_X(x)$, and use the \texttt{integrate()} routine in R to integrate \texttt{sg} with the appropriate integration limits.)
+      \item[(b)] Compute the same net premium as in part (a), using the translated gamma approximation and the formula (MART (1.33)):
+      \[
+        \mathrm{E}[(X-d)_+] = \int_d^{\infty} (x-d)\,f_X(x)\,\mathrm{d}x.
+      \]
+      Verify that you get the same answer as in part (a). (\textit{Hint}: Write a function \texttt{xdg} that computes the integrand $(x-d)f_X(x)$, and use the \texttt{integrate()} routine in R to integrate \texttt{xdg} with the appropriate integration limits.)
+      \item[(c)] By formula (3.105) in MART, the net stop-loss premium of a $\mathrm{gamma}(\alpha,\beta)$ random variable $U$ can be computed as:
+      \[
+        \mathrm{E}[(U-d)_+] = \frac{\alpha}{\beta}\bigl[1 - G(d;\alpha+1,\beta)\bigr] - d\bigl[1 - G(d;\alpha,\beta)\bigr].
+      \]
+      Compute the net stop-loss premium $\mathrm{E}[(X-170)_+] = \mathrm{E}[(U+x_0-170)_+]$ using this formula as well, and verify that you get the same answer as in parts (a) and (b).
+  \end{enumerate}
+\end{enumerate}
+
+\newpage
+\begin{enumerate}
+  \item [$\boldsymbol{Q_7}$]
+    \begin{enumerate}
+      \item[] Next, we would like to compute the same net premium $\mathrm{E}[(X-170)_+]$ via the NP approximation. Formula (3.101) in MART tells us that:
+\[
+  \mathrm{E}[(X-170)_+] = \sigma\,\mathrm{E}\!\left[\left(Z - \frac{170-\mu}{\sigma}\right)_+\right], \quad \text{with } Z = \frac{X-\mu}{\sigma}.
+\]
+Moreover, formula (3.114) states that by the NP-approximation to the cdf of $Z$, we have:
+\[
+  \mathrm{E}[(Z-d)_+] \approx \varphi\!\bigl(w(d)\bigr)\!\left[1 + \frac{\gamma}{6}w(d)\right] - d\bigl[1-\Phi(w(d))\bigr],
+  \quad \text{with } w(d) = \sqrt{\frac{9}{\gamma^2} + \frac{6d}{\gamma} + 1} - \frac{3}{\gamma}.
+\]
+Now approximate the net stop-loss premium $\mathrm{E}[(X-170)_+]$ by this technique as well. Your result should be close to the premium computed in Q6 (but not identical, since we are using a different approximation here).
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+\subsection*{Net premium for an alternative reinsurance contract}
+Now imagine an alternative reinsurance contract that pays an amount 1 (again in some monetary unit) in case the loss ratio $X$ (as an integer) is larger than 140 and less than or equal to 160, 2 if the loss ratio is larger than 160 and less than or equal to 180, and 3 if it is larger than 180. Using the indicator function notation (MART (2.33)), the payment $Y$ of the reinsurance company can be written as
+\[
+  Y = I_{(140,160]}(X) + 2\,I_{(160,180]}(X) + 3\,I_{(180,\infty)}(X).
+\]
+Therefore, the net premium for this reinsurance contract is
+\begin{align*}
+  \mathrm{E}[Y] &= \Pr[140 < X \leq 160] + 2\,\Pr[160 < X \leq 180] + 3\,\Pr[X > 180]\\
+                &= \Pr[X > 140] + \Pr[X > 160] + \Pr[X > 180].
+\end{align*}
+
+\begin{enumerate}
+  \item [$\boldsymbol{Q_8}$]
+  \begin{enumerate}
+    \item [(a)] Compute the net premium for this reinsurance contract using the translated gamma approximation to $X$. Use continuity correction again.
+    \item [(b)] Compute the net premium for this reinsurance contract using the NP approximation to $X$. Use continuity correction again. The answer should be close, but not identical, to the answer in part (a).
+  \end{enumerate}
+\end{enumerate}
+
+\newpage
+\section{Censored observations}
+Suppose we find out that the 100 weekly loss ratios stored in $X$ actually come from an observation period of 170 weeks rather than 100 weeks. The 70 loss ratios not recorded in $X$ were all less than or equal to 67\%, and their exact values were not recorded because the insurance company is only interested in loss ratios exceeding 67\%. This means that we have a left-censored dataset: for some data points (the ones recorded in $X$) we know the exact value, but for the other data points (the 70 loss ratios not recorded in $X$) we only have partial information, namely that they are below a certain threshold value.
+ 
+Censoring should be taken into account when we fit a distribution to the dataset. In this section, we will once again use a normal approximation for the dataset $X$, but when we estimate the parameters of that normal distribution, we will take into account the fact that there are 70 ``censored'' observations less than or equal to 67\%.
+ 
+If there were no censored data at all, the likelihood function of the normal parameters $\mu, \sigma$ based on the observations $x_1, \ldots, x_{100}$ in $X$ would be:
+\[
+  L(\mu,\sigma;\,x_1,\ldots,x_{100}) = \prod_{i=1}^{100}\bigl[\Phi(x_i+0.5;\mu,\sigma) - \Phi(x_i-0.5;\mu,\sigma)\bigr],
+\]
+where $\Phi(\,\cdot\,;\mu,\sigma)$ denotes the normal cdf with parameters $\mu$ and $\sigma$. This expression follows from the fact that under the normal assumption, the rounded loss ratio $X$ will be equal to $x_i$ with probability $\Phi(x_i+0.5;\mu,\sigma) - \Phi(x_i-0.5;\mu,\sigma)$.
+ 
+With 70 censored observations less than or equal to 67, the likelihood function becomes:
+\[
+  L(\mu,\sigma;\,x_1,\ldots,x_{100}) = \Phi(67.5;\mu,\sigma)^{70}\prod_{i=1}^{100}\bigl[\Phi(x_i+0.5;\mu,\sigma) - \Phi(x_i-0.5;\mu,\sigma)\bigr],
+\]
+so each censored observation contributes a factor of $\Phi(67.5;\mu,\sigma)$, the probability of being less than 67.5, to the likelihood. Therefore the log-likelihood with censoring is:
+\begin{align*}
+  \log L(\mu,\sigma;\,x_1,\ldots,x_{100})
+  = 70\log\bigl[\Phi(67.5;\mu,\sigma)\bigr]
+  + \sum_{i=1}^{100}\log\bigl[\Phi(x_i+0.5;\mu,\sigma) - \Phi(x_i-0.5;\mu,\sigma)\bigr].
+\end{align*}
+The maximum likelihood estimates for $\mu$ and $\sigma$ under censoring can be found by numerically maximizing this log-likelihood function.
+
+\begin{enumerate}
+  \item [$\boldsymbol{Q_9}$]
+    \begin{enumerate}
+      \item[(a)] Write an R function called \texttt{negloglik} that computes the negative log-likelihood function with censoring, using observations in $X$. The function should take one vector argument \texttt{mu.sig}, with \texttt{mu.sig[1]} corresponding to $\mu$ and \texttt{mu.sig[2]} corresponding to $\sigma$.
+      \item[(b)] Use \texttt{optim()} to minimize the negative log-likelihood, using the sample mean \texttt{mu} and sample standard deviation \texttt{sigma} as starting values. Store the optimal parameter values $\mu_c$ and $\sigma_c$ under censoring as \texttt{mu.c} and \texttt{sigma.c}. 
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+We would like to see visually if the normal approximation under censoring is better than the normal approximation without censoring, as in Q1. Note that when observations below 67.5 are censored, the observations in $X$ do not have the $N(\mu_c, \sigma_c^2)$ distribution, but the $N(\mu_c, \sigma_c^2)$ distribution conditional on exceeding 67.5, with density
+\[
+  \frac{\varphi(x;\,\mu_c,\sigma_c^2)}{1 - \Phi(67.5;\,\mu_c,\sigma_c^2)}, \qquad x > 67.5.
+\]
+\begin{enumerate}
+  \item[$\boldsymbol{Q_{10}}$]
+  \begin{enumerate}
+    \item [(a)] Fill in the dots below to write an R function \texttt{CondDens} that, for its argument \texttt{x}, computes the conditional normal density given above. Use the parameters \texttt{mu.c}, \texttt{sigma.c} you computed in Q9. Make sure that \texttt{CondDens} returns zero when \texttt{x <= 67.5}.
+ 
+\begin{lstlisting}
+CondDens <- function(x) {ifelse(x <= 67.5, ..., ...)}
+\end{lstlisting}
+
+    \item [(b)] Reproduce the histogram and the fitted normal density from Q1, and add the conditional density \texttt{CondDens} to the plot as well, by running the script below. Does the conditional normal density with censoring fit the data better than the unconditional normal approximation?
+ 
+\begin{lstlisting}
+hist(X, prob=TRUE, las=1, col="gray85",
+     xlim=c(40,180), breaks=20, xlab="", ylab="") ## histogram of X
+curve(dnorm(...), add=TRUE, col="red", lwd=2)      ## copy answer from Q1(a)
+curve(CondDens(x), add=TRUE, col="green3", lwd=2)  ## add cond. density
+\end{lstlisting}
+  \end{enumerate}
+  
+\end{enumerate}
+ 
+
+\end{document}
