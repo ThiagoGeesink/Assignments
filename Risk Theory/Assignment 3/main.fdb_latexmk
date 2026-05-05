@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1777962701.57952 "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 3/Assignment 2/main.tex" "main.pdf" "main" 1777962702.7614 0
-  "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 3/Assignment 2/main.tex" 1777962701.4436 27819 27e43a511abf5e4800985ef4c1215af0 ""
+["pdflatex"] 1777963894.19467 "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 3/main.tex" "main.pdf" "main" 1777963895.73639 0
+  "/Users/thiagogeesink/Library/CloudStorage/OneDrive-Personal/UvA/Jaar 5/Semester 2/Github:Assignments/Assignments/Risk Theory/Assignment 3/main.tex" 1777963894.07676 28216 b0df2e9e9ee0463b7ee573790340fb50 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tctt0900.tfm" 1136768653 1536 bda3e6bf9784a4cc572c754e0c3eeb00 ""
@@ -130,10 +130,13 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1774881559 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774881443 3636776 323502a95cec860139f90a2a5dc85fa3 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
+  "Assignment 3 Q10b.png" 1777963824.0709 109239 9b020676d8317b3775964f01f89cc9f9 ""
+  "Assignment 3 Q1b.png" 1777963104.17694 78733 ff221dc310ef7feadda5a5ab1937618d ""
+  "Assignment 3 Q5.png" 1777963388.6641 106987 c29a7ed2bba8313782f1f1c68c06f71d ""
   "logo.jpg" 1777924954.35933 235496 6c192f001d4525434ed8d32af8b5497b ""
-  "main.aux" 1777962702.65951 1226 88bf528cef2d2d6845f9b622e217ba01 "pdflatex"
-  "main.out" 1777962702.66005 1864 94dc635586139284633e6aa46730d331 "pdflatex"
-  "main.tex" 1777962701.4436 27819 27e43a511abf5e4800985ef4c1215af0 ""
+  "main.aux" 1777963895.64396 1227 714a430373f123ea0b3190c3ef4a5c34 "pdflatex"
+  "main.out" 1777963895.64462 1864 94dc635586139284633e6aa46730d331 "pdflatex"
+  "main.tex" 1777963894.07676 28216 b0df2e9e9ee0463b7ee573790340fb50 ""
   (generated)
   "main.aux"
   "main.log"

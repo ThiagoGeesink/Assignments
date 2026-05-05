@@ -102,7 +102,9 @@ hist(X, prob=TRUE, las=1, col="gray85",
 curve(dnorm(x, mean=k1, sd=sqrt(k2)), add=TRUE, col="red", lwd=2)
 \end{lstlisting}
       \item[(b)] Based on the plot, does it look like the random variable $X$ underlying the sample has a normal distribution?
-
+      \begin{center}
+        \includegraphics[width=0.7\textwidth]{Assignment 3 Q1b.png}
+      \end{center}
       A: No. The histogram shows a clear right skew: most observations are concentrated in the range 68--110, with a long tail stretching toward 170. A normal distribution is symmetric.
 
       \item[(c)] Apply the Jarque-Bera test for normality to the sample $X$. Based on the result of this test, does it look like the random variable $X$ underlying this sample has a normal distribution? \\
@@ -275,7 +277,12 @@ legend("topright", legend=c("Normal","Trans. Gamma"),
        col=c("red","blue"), lwd=2)
 \end{lstlisting}
 
+      \begin{center}
+        \includegraphics[width=0.7\textwidth]{Assignment 3 Q5.png}
+      \end{center}
+
       From the plot, the translated gamma approximation (blue) fits the data better than the normal (red). The translated gamma captures the right skew of the histogram, placing more probability mass in the right tail and less in the symmetric left tail assumed by the normal. The mode of the blue curve aligns more closely with the peak of the histogram around 80--90, while the red curve is too symmetric and underestimates the right tail.
+
     \end{enumerate}
 \end{enumerate}
 
@@ -289,6 +296,7 @@ In the figure below, we approximate the discrete cdf $F \sim \mathrm{Uniform}\{1
 
 \begin{enumerate}
   \item[$\boldsymbol{Q_6}$]
+To use the translated gamma approximation, we assume that $X \sim U + x_0$ with $U \sim \mathrm{gamma}(\alpha, \beta)$. Equivalently, we assume $F_X(x) \approx G(x - x_0; \alpha, \beta)$ for the cdf $F_X$ of $X$, where $G(\,\cdot\,; \alpha, \beta)$ denotes the $\mathrm{gamma}(\alpha, \beta)$ cdf. Also see MART (2.56).
     \begin{enumerate}
       \item[(a)] Compute the net stop-loss premium $\mathrm{E}[(X-170)_+]$ using the translated gamma approximation and the formula (MART (1.33)):
       \[
@@ -311,8 +319,6 @@ integrate(sg, lower=d, upper=Inf)$value  ## 0.072888
 xdg <- function(x) (x - d) * dgamma(x - x0, shape=alpha, rate=beta)
 integrate(xdg, lower=d, upper=Inf)$value  ## 0.072888
 \end{lstlisting}
-
-      Both representations of the stop-loss premium are equivalent.
 
       \item[(c)] By formula (3.105) in MART, the net stop-loss premium of a $\mathrm{gamma}(\alpha,\beta)$ random variable $U$ can be computed as:
       \[
@@ -352,8 +358,6 @@ w_d  <- sqrt(9/gam^2 + 6*c_np/gam + 1) - 3/gam
 sl_np <- sigma * (dnorm(w_d) * (1 + (gam/6)*w_d) - c_np * (1 - pnorm(w_d)))
 sl_np  ## 0.075195
 \end{lstlisting}
-
-      This is close to, but slightly higher than, the translated gamma result of 0.0729. The small difference arises because the two methods use different distributional approximations.
     \end{enumerate}
 \end{enumerate}
 
@@ -469,7 +473,7 @@ CondDens <- function(x) {
            (1 - pnorm(67.5, mean=mu.c, sd=sigma.c)))
 }
 \end{lstlisting}
-
+\newpage
     \item[(b)] Reproduce the histogram and the fitted normal density from Q1, and add the conditional density \texttt{CondDens} to the plot as well. Does the conditional normal density with censoring fit the data better than the unconditional normal approximation? \\A:
 
 \begin{lstlisting}
@@ -481,6 +485,9 @@ legend("topright",
        legend=c("Normal (uncensored)", "Normal (censored)"),
        col=c("red","green3"), lwd=2)
 \end{lstlisting}
+      \begin{center}
+        \includegraphics[width=0.7\textwidth]{Assignment 3 Q10b.png}
+      \end{center}
 
       Yes, the conditional normal density under censoring (green) fits the observed data better than the unconditional normal (red). Because the censored MLE assigns a lower mean ($\approx 72$) and larger standard deviation ($\approx 28$) to the full (uncensored) distribution, the resulting conditional density truncated below 67.5 has a peak that aligns more closely with the histogram and a heavier right tail, capturing the skewness of the data more. The uncensored normal with $\mu = 90$ is too concentrated and too symmetric compared to the actual distribution of the observed loss ratios.
   \end{enumerate}
