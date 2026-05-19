@@ -117,7 +117,14 @@ FillP <- function(p) {
   \item [$\boldsymbol{Q}_1$]
   \begin{enumerate}
     \item [(a)] Suppose that for a certain driver, the probabilities of $0, 1, 2, 3^+$ claims are $0.65, 0.20, 0.10, 0.05$, respectively. Compute (by hand) the probabilities $P_{7j}$ for $j = 1, \ldots, 14$. \newline
-    A:
+    A: 
+    From the \texttt{Next} matrix, column 7 gives the destination classes: 0 claims $\to$ class 8, 1 claim $\to$ class 4, and both 2 and 3+ claims $\to$ class 1. Accumulating probabilities over all transitions that lead to each destination:
+    \begin{align*}
+      P_{7,1} &= \Pr[\text{2 claims}] + \Pr[\text{3+}] = 0.10 + 0.05 = 0.15, \\
+      P_{7,4} &= \Pr[\text{1 claim}] = 0.20, \\
+      P_{7,8} &= \Pr[\text{0 claims}] = 0.65, \\
+      P_{7,j} &= 0 \quad \text{for all other } j.
+    \end{align*}
     \item [(b)] Now compute the probabilities in part (a) using the \lstinline[]|FillP| function, and verify that you get the same results as in part (a). \newline
     A:
 \begin{lstlisting}
@@ -177,6 +184,7 @@ The resulting efficiency value $e(0.05) = 0.103$ is consistent with what we see 
 \begin{lstlisting}
 [1] 1.50351789456e-20 9.73730006967e-17
 \end{lstlisting}
+      All 14 column standard deviations lie between $10^{-20}$ and $10^{-17}$, so the chain has converged to its steady-state distribution after 1024 steps regardless of the starting class.
       \item [(b)] We also want to verify that $\mathbf{P} = \mathbf{P}^{1024}$ is a proper probability matrix, that is, each row of $\mathbf{P}$ adds up to 1. Fill in the dots to do this, and comment on the output:
       \begin{lstlisting}
       range(apply(P, ..., ...)) - 1
@@ -185,6 +193,7 @@ The resulting efficiency value $e(0.05) = 0.103$ is consistent with what we see 
 \begin{lstlisting}
 [1] 1.06581410364e-14 1.11022302463e-14
 \end{lstlisting}
+The deviation of each row sum from 1 is on the order of $10^{-14}$. Every row therefore sums to exactly 1, confirming that $\mathbf{P}^{1024}$ remains a proper probability matrix after repeated squaring.
     \end{enumerate}
 \end{enumerate}
 \clearpage
@@ -309,6 +318,17 @@ Taking $\varepsilon = 10^{-4}$ as before gives an estimation error of $\frac{1}{
   \begin{enumerate}
     \item [(a)] Use $\log xy = \log x + \log y$ and $\log(1 + x) \approx x$ for small $|x|$, as well as Equation~\ref{eq:approx}, to prove the approximation in Equation~\ref{eq:error}. \newline
     A:
+    Let $\lambda^{\pm} = \lambda(1 \pm \varepsilon)$
+    \begin{align*}
+      &\log\!\bigl(0.998\,b(\lambda^+)\bigr) - \log\!\bigl(1.002\,b(\lambda^-)\bigr) \\
+      &\quad= \bigl[\log b(\lambda^+) + \log 0.998\bigr] - \bigl[\log b(\lambda^-) + \log 1.002\bigr].
+    \end{align*}
+    Applying $\log(1+x) \approx x$ for $|x|$ small: $\log 0.998 = \log(1-0.002) \approx -0.002$ and $\log 1.002 \approx 0.002$, so the numerator becomes $[\log b(\lambda^+) - \log b(\lambda^-)] - 0.004$. For the denominator, $\log(\lambda^+) - \log(\lambda^-) = \log\!\frac{1+\varepsilon}{1-\varepsilon} \approx 2\varepsilon$. Dividing gives
+    \[
+      \frac{[\log b(\lambda^+) - \log b(\lambda^-)] - 0.004}{2\varepsilon}
+      = \underbrace{\frac{\log b(\lambda^+) - \log b(\lambda^-)}{\log \lambda^+ - \log \lambda^-}}_{\approx\, e(\lambda)} - \frac{0.004}{2\varepsilon}
+      = e(\lambda) - \frac{1}{500\varepsilon}.
+    \] \clearpage
     \item [(b)] Estimate the efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ using simulations. Adapt the script given above to estimate both $b(\lambda(1-\varepsilon))$ and $b(\lambda(1+\varepsilon))$ via $NSim = 10,000$ simulations, and then apply Equation~\ref{eq:approx} to find $e(\lambda)$. Repeat this procedure five times to get five $e(\lambda)$ estimates. How do they compare with the $e(\lambda)$ value we computed in Q3/Q4? \newline
     A:
 \begin{lstlisting}
@@ -336,6 +356,7 @@ sim_e <- function(lam, eps_val, NSim=10000, TMax=100) {
 > e_rsst
 [1] 0.10304
 \end{lstlisting}
+The five simulation estimates range from roughly 4 to 19, all far from the exact value of $0.103$. This is exactly the noise predicted in part (a): with $\varepsilon = 10^{-4}$.
     
     \item [(c)] Repeat part (b), but now with $\varepsilon = 0.1$. How do the $e(\lambda)$ estimates compare with the value in Q3/Q4? \newline
     A:
@@ -345,6 +366,7 @@ sim_e <- function(lam, eps_val, NSim=10000, TMax=100) {
 > e_rsst
 [1] 0.10304
 \end{lstlisting}
+With $\varepsilon = 0.1$, all five estimates fall within the range $[0.092, 0.116]$, close to the exact value of $0.103$. The noise bias is now $1/(500 \times 0.1) = 0.02$, which is of similar magnitude to the random error and small enough to yield useful estimates but at the cost of a larger approximation error from using a bigger difference.
   \end{enumerate}
 \end{enumerate}
 
@@ -391,6 +413,7 @@ b_leap <- mean(BM.frac[FinalBM_leap])
 > round(100*(b_sim - b_leap)/b_sim, 3)
 [1] 3.254
 \end{lstlisting}
+A reduction of approximately $3.3\%$
 \end{enumerate}
 \clearpage
 
@@ -445,6 +468,7 @@ b_ext  <- sum(stst20 * BM.frac20)
 > round(100*(1 - b_ext/b_exact), 2)
 [1] 7.45
 \end{lstlisting}
+The extended BM system reduces the steady-state premium from $0.3261$ to $0.3018$, a decrease of approximately $7.5\%$. The bonus guarantee is more generous than the leap-year ($3.3\%$).
   \end{enumerate}
 \end{enumerate}
 \clearpage
@@ -488,7 +512,7 @@ for (i in 1:100) {
     \begin{center}
       \includegraphics[width=0.7\textwidth]{Assignment 5 Q9b.png}
     \end{center}
-    The ratio is lowest ($\approx$ 0.816) around $\lambda$ = 0.15. Drivers with an intermediate claim frequency (about 1 claim every 6-7 years) benefit most: they file occasional claims so cannot easily stay at class 14 in the original system, but with the bonus guarantee they can reach classes 15-20 and recover there after a claim. Very low-$\lambda$ drivers already sit permanently at class 14 (little to gain). Very high-$\lambda$ drivers claim so often that the extra classes offer little shelter.
+    The ratio is lowest ($\approx 0.816$) around $\lambda = 0.15$. Drivers with an intermediate claim frequency (about 1 claim every 6-7 years) benefit most
 
   \end{enumerate}
 \end{enumerate}
