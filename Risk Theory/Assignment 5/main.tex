@@ -97,10 +97,8 @@ c( 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 9), ## 1 claim
 c( 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5), ## 2 claims
 c( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)) ## 3+ claims
 BM.frac <- c(120,100,90,80,70,60,55,50,45,40,37.5,35,32.5,30)/100
-\end{lstlisting}
- 
-So \texttt{Next[k,a]} = $b$ means that one goes from class $a$ to class $b$ in case of $k-1 = 0,1,2,3+$ claims. For example, the entry \texttt{Next[2,7]} equals 4, so if a driver is in class 7 now, and files 1 claim this year, then she will drop down to class 4 next year. In the vector \texttt{BM.frac} one sees that next year in class 4, this driver will pay 80\% of the base premium instead of the 55\% she is paying this year.
- 
+\end{lstlisting} 
+So \texttt{Next[k,a]} = $b$ means that one goes from class $a$ to class $b$ in case of $k-1 = 0,1,2,3+$ claims. For example, the entry \texttt{Next[2,7]} equals 4, so if a driver is in class 7 now, and files 1 claim this year, then she will drop down to class 4 next year. In the vector \texttt{BM.frac} one sees that next year in class 4, this driver will pay 80\% of the base premium instead of the 55\% she is paying this year. \newline
 The probability of going from class $i$ to $j$ is $P_{ij} = \sum_k \Pr[\text{$k$ claims}]$, where the sum is taken over all $k$ values that lead to a transition from $i$ to $j$. For example, $P_{7,1} = \Pr[\text{2 claims}] + \Pr[\text{3+ claims}]$, because a transition from class 7 to class 1 is only possible if one files 2 or 3+ claims. The $14 \times 14$ matrix of all transition probabilities $P_{ij}$ is denoted by $\mathbf{P}$. From the vector $p$ containing probabilities of 0, 1, 2, 3+ claims, the transition matrix $\mathbf{P}$ can be constructed (or ``filled'') using the following R function:
  
 \begin{lstlisting}
@@ -116,10 +114,16 @@ FillP <- function(p) {
 \end{lstlisting}
  
 \begin{enumerate}
-  \item [$Q_1$]
+  \item [$\boldsymbol{Q}_1$]
   \begin{enumerate}
-    \item [(a)] Suppose that for a certain driver, the probabilities of 0, 1, 2, 3+ claims are 0.65, 0.20, 0.10, 0.05, respectively. Compute (by hand) the probabilities $P_{7,j}$ for $j = 1, \ldots, 14$.
-    \item [(b)] Now compute the probabilities in part (a) using the FillP function, and verify that you get the same results as in part (a).
+    \item [(a)] Suppose that for a certain driver, the probabilities of $0, 1, 2, 3^+$ claims are $0.65, 0.20, 0.10, 0.05$, respectively. Compute (by hand) the probabilities $P_{7j}$ for $j = 1, \ldots, 14$. \newline
+    A:
+    \item [(b)] Now compute the probabilities in part (a) using the \lstinline[]|FillP| function, and verify that you get the same results as in part (a). \newline
+    A:
+\begin{lstlisting}
+> P_filled[7,]
+[1] 0.15 0.00 0.00 0.20 0.00 0.00 0.00 0.65 0.00 0.00 0.00 0.00 0.00 0.00
+\end{lstlisting}
   \end{enumerate}
 \end{enumerate}
 
@@ -140,7 +144,7 @@ But the probability of going from $i$ to $j$ in $k$ steps is given by the $(i, j
 \Pr[i \to j \text{ in 2 steps}] = \sum_h \Pr[i \to h \to j] \stackrel{\text{Markov}}{=} \sum_h \Pr[i \to h] \Pr[h \to j] = \sum_h P_{ih} P_{hj} = (\mathbf{P}^2)_{ij}.
 \end{equation*}
 For $k \geq 2$, the same thing can be shown via induction. \newline
-We conclude that for large $k$, any row of the matrix $\mathbf{P}^k$ approximates the steady-state distribution (since the initial state does not matter), so the rows of $\mathbf{P}^k$ should be approximately equal, and any one of them can be used as an approximation of the steady-state distribution. We assume that $k = 2^{10} = 1024$ years is large enough to yield a good approximation to the driver's steady-state distribution. \newline
+We conclude that for large $k$, any row of the matrix $\mathbf{P}^k$ approximates the steady-state distribution (since the initial state does not matter), so the rows of $\mathbf{P}^k$ should be approximately equal, and any one of them can be used as an approximation of the steady-state distribution. We assume that $k = 2^{10} = 1024$ years is large enough to yield a good approximation to the driver's steady-state distribution. \newline \newline
 In the R script below, we approximate the Loimaranta efficiency $e(\lambda)$ at $\lambda = 0.05$ via Equation~\ref{eq:approx}. We take $\varepsilon = 0.0001$ and find the steady-state distribution for $\lambda(1 - \varepsilon)$ and $\lambda(1 + \varepsilon)$ as the bottom row of $\mathbf{P}^{1024}$. Note that computing $\mathbf{P}^{1024}$ is easy by taking a square ten times:
  
 \[\mathbf{P} \to \mathbf{P}^2 \to (\mathbf{P}^2)^2 = \mathbf{P}^4 \to \mathbf{P}^8 \to \cdots \to \mathbf{P}^{2^{10}} = \mathbf{P}^{1024}.\]
@@ -163,17 +167,24 @@ options(digits=12) ## print many digits, for later comparison
 The resulting efficiency value $e(0.05) = 0.103$ is consistent with what we see in the graph on the first page.
 \clearpage
 \begin{enumerate}
-  \item [$Q_2$]
+  \item [$\boldsymbol{Q}_2$]
     \begin{enumerate}
       \item [(a)] We want to verify that the 14 rows of $\mathbf{P} = \mathbf{P}^{1024}$ we computed above are indeed (approximately) equal. Rather than printing the matrix $\mathbf{P}$ and checking the equality of rows by visual inspection, we can verify that each column of $\mathbf{P}$ is approximately constant, by applying the \texttt{sd} function to each column, and then displaying the minimum and maximum (i.e. range) of the resulting 14 standard deviations. Fill in the dots to do this, and comment on the output (consult \texttt{?apply} if necessary):
       \begin{lstlisting}
       range(apply(P, ..., ...))
       \end{lstlisting}
+      A: \lstinline|range(apply(P, 2, sd))|
+\begin{lstlisting}
+[1] 1.50351789456e-20 9.73730006967e-17
+\end{lstlisting}
       \item [(b)] We also want to verify that $\mathbf{P} = \mathbf{P}^{1024}$ is a proper probability matrix, that is, each row of $\mathbf{P}$ adds up to 1. Fill in the dots to do this, and comment on the output:
- 
       \begin{lstlisting}
       range(apply(P, ..., ...)) - 1
       \end{lstlisting}
+      A: \lstinline|range(apply(P, 1, sum)) - 1|
+\begin{lstlisting}
+[1] 1.06581410364e-14 1.11022302463e-14
+\end{lstlisting}
     \end{enumerate}
 \end{enumerate}
 \clearpage
@@ -188,23 +199,57 @@ In the previous section, we used the rows of $\mathbf{P}^{1024}$ to approximate 
 stst <- eigen(t(P))$vectors[,1] ## t(P) is P transposed
 stst <- Re(stst/sum(stst)) ## enforce sum=1, take real part only
 \end{lstlisting}
-Note that \texttt{eigen(t(P))\$vectors} returns the right-hand eigenvectors of $\mathbf{P}^\top$ as columns of a matrix, and the columns are sorted in decreasing order of the corresponding eigenvalues (see \texttt{?eigen}). Since 1 is the largest eigenvalue of $\mathbf{P}^\top$, as explained in MART p. 145, we take the first column of \texttt{eigen(t(P))\$vectors} using the index \texttt{[,1]}. This gives us the eigenvector corresponding to the eigenvalue 1, as we want. Then we scale this vector so that its entries add up to 1, and this is our steady-state vector. \newline
- The exact steady-state vectors will lead to exact values for $b(\lambda(1-\varepsilon))$ and $b(\lambda(1+\varepsilon))$, which we can then plug into Equation~\ref{eq:approx} as before to approximate $e(\lambda)$ with a difference quotient. \newline
+Note that \texttt{eigen(t(P))\$vectors} returns the right-hand eigenvectors of $\mathbf{P}^\top$ as columns of a matrix, and the columns are sorted in decreasing order of the corresponding eigenvalues (see \texttt{?eigen}). Since 1 is the largest eigenvalue of $\mathbf{P}^\top$, as explained in MART p. 145, we take the first column of \texttt{eigen(t(P))\$vectors} using the index \texttt{[,1]}. This gives us the eigenvector corresponding to the eigenvalue 1, as we want. Then we scale this vector so that its entries add up to 1, and this is our steady-state vector. \newline \newline
+The exact steady-state vectors will lead to exact values for $b(\lambda(1-\varepsilon))$ and $b(\lambda(1+\varepsilon))$, which we can then plug into Equation~\ref{eq:approx} as before to approximate $e(\lambda)$ with a difference quotient. \newline \newline
 (In MART Sec. 6.4, a method is described to compute $e(\lambda)$ without relying on difference quotients, but this is not in the scope of this course or this assignment. In any case, this exact method does not lead to much improvement, because the difference quotient (Equation~\ref{eq:approx}) gives the true derivative with an error $O(\varepsilon^2)$, so for example with $\varepsilon = 0.0001$, we get an error of order $10^{-8}$, very much negligible for all applications. For higher precision, $\varepsilon$ can be taken even smaller.)
 
 \begin{enumerate}
-  \item [$Q_3$] Compute the value of the Loimaranta efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ again, by re-running the script before Q2, but this time compute the steady-state vector \texttt{stst} via \texttt{eigen} as described above, instead of approximating it as the bottom row of $\mathbf{P}^{1024}$. The resulting value of $e(0.05)$ should be equal to the one computed above in about 10 digits. \newline
-  So the rows of $\mathbf{P}^{1024}$ seem to provide an excellent approximation to the steady-state distribution; using exact steady-state distributions barely changes the efficiency value $e(0.05)$.
+  \item [$\boldsymbol{Q}_3$] Compute the value of the Loimaranta efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ again, by re-running the script before Q2, but this time compute the steady-state vector \texttt{stst} via \texttt{eigen} as described above, instead of approximating it as the bottom row of $\mathbf{P}^{1024}$. The resulting value of $e(0.05)$ should be equal to the one computed above in about 10 digits. \newline
+  A:
+\begin{lstlisting}
+b_eig <- c(0, 0)
+for (i in 1:2) {
+  pp   <- dpois(0:2, lams[i])
+  Ptmp <- FillP(c(pp, 1-sum(pp)))
+  stst <- eigen(t(Ptmp))$vectors[, 1]
+  stst <- Re(stst / sum(stst))
+  b_eig[i] <- sum(stst * BM.frac)
+}
+e_eig <- (log(b_eig[2])-log(b_eig[1])) / (log(lams[2])-log(lams[1]))
+\end{lstlisting}
+\begin{lstlisting}
+> e_eig
+[1] 0.103040331376
+> e_pow
+[1] 0.103040331585  
+\end{lstlisting}
 \end{enumerate}
 \clearpage
- 
+So the rows of $\mathbf{P}^{1024}$ seem to provide an excellent approximation to the steady-state distribution; using exact steady-state distributions barely changes the efficiency value $e(0.05)$.
 \subsection{Using the Rolski--Schmidli--Schmidt--Teugels Formula}
  
 The second exact way to find the steady-state distribution uses the Rolski--Schmidli--Schmidt--Teugels (RSST) formula. In the slides for Lecture 10 (slide 9), it is shown that the steady-state vector $\ell$ can be computed as $\ell = \mathbf{1}(\mathbf{I} - \mathbf{P} + \mathbf{1})^{-1}$, where $\mathbf{1}$ is a row vector of fourteen 1's, $\mathbf{I}$ is the $14 \times 14$ identity matrix, $\mathbf{1}$ is a $14 \times 14$ matrix of 1's, and $\mathbf{A}^{-1}$ denotes the inverse of matrix $\mathbf{A}$.
  
 \begin{enumerate}
-  \item [$Q_4$] Compute the value of the efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ again, by re-running the script before Q2, but this time compute the steady-state vector \texttt{stst} via the RSST formula. The resulting value of $e(0.05)$ should be equal to the one computed in Q3 in about 10 digits. \newline
-  \textit{Hint:} \texttt{diag(14)} produces the $14 \times 14$ identity matrix, \texttt{1} will be interpreted as a matrix of 1's when it is added to another matrix, \texttt{solve(A)} returns the inverse of matrix \texttt{A}.
+  \item [$\boldsymbol{Q}_4$] Compute the value of the efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ again, by re-running the script before Q2, but this time compute the steady-state vector \texttt{stst} via the RSST formula. The resulting value of $e(0.05)$ should be equal to the one computed in Q3 in about 10 digits. \textit{Hint:} \texttt{diag(14)} produces the $14 \times 14$ identity matrix, \texttt{1} will be interpreted as a matrix of 1's when it is added to another matrix, \texttt{solve(A)} returns the inverse of matrix \texttt{A}. \newline
+  A:
+\begin{lstlisting}
+b_rsst <- c(0, 0)
+for (i in 1:2) {
+  pp   <- dpois(0:2, lams[i])
+  Ptmp <- FillP(c(pp, 1-sum(pp)))
+  stst <- rep(1, 14) %*% solve(diag(14) - Ptmp + matrix(1, 14, 14))
+  stst <- as.numeric(stst) / sum(stst)
+  b_rsst[i] <- sum(stst * BM.frac)
+}
+e_rsst <- (log(b_rsst[2])-log(b_rsst[1])) / (log(lams[2])-log(lams[1]))
+\end{lstlisting}
+\begin{lstlisting}
+> e_rsst
+[1] 0.103040331393
+> e_eig
+[1] 0.103040331376
+\end{lstlisting}
 \end{enumerate}
 \clearpage
 
@@ -231,9 +276,25 @@ sd(BM.frac[FinalBM]) ## 0.061
 \end{lstlisting}
 The Loimaranta efficiency $e(\lambda)$ can now be estimated as a difference quotient as in Equation~\ref{eq:approx}, where both $b(\lambda(1 - \varepsilon))$ and $b(\lambda(1 + \varepsilon))$ are estimated via 10,000 simulations as above. \newline
 How precise is the estimate for $b(\lambda)$ when we use 10,000 simulations? Let $X_i$ denote the premium paid in the final BM class in the $i$-th simulation run. We estimate $b(\lambda) = \mathbb{E}[X_i]$ as $\bar{X}$, the average of the $X_i$ values. By the Central Limit Theorem, $\bar{X}$ is normal with mean $\mu_{X_i} = b(\lambda)$ and standard deviation $\sigma_{X_i}/\sqrt{10,000} \approx 0.061/100$. This implies that there is about 99\% chance that the $b(\lambda)$ estimate $\bar{X}$ will lie inside the interval $(0.995 b(\lambda), 1.005 b(\lambda))$.
- 
+\clearpage
 \begin{enumerate}
-  \item [$Q_5$] Use any technique described in Section 2 or 3 above ($\mathbf{P}^{1024}$, \texttt{eigen()}, RSST) to compute the steady-state premium $b(0.05)$ more precisely, and verify that the simulation estimate 0.325 indeed lies in the interval $(0.995 b(0.05), 1.005 b(0.05))$.
+  \item [$\boldsymbol{Q}_5$] Use any technique described in Section 2 or 3 above ($\mathbf{P}^{1024}$, \texttt{eigen()}, RSST) to compute the steady-state premium $b(0.05)$ more precisely, and verify that the simulation estimate 0.325 indeed lies in the interval $(0.995 b(0.05), 1.005 b(0.05))$. \newline
+  A:
+\begin{lstlisting}
+pp      <- dpois(0:2, 0.05)
+Ptmp    <- FillP(c(pp, 1-sum(pp)))
+stst_ex <- rep(1,14) %*% solve(diag(14) - Ptmp + matrix(1,14,14))
+stst_ex <- as.numeric(stst_ex) / sum(stst_ex)
+b_exact <- sum(stst_ex * BM.frac)
+\end{lstlisting}
+\begin{lstlisting}
+> b_sim
+[1] 0.325105
+> b_exact
+[1] 0.326079
+> b_sim >= 0.995*b_exact & b_sim <= 1.005*b_exact
+[1] TRUE
+\end{lstlisting}
 \end{enumerate}
 \clearpage
 So it might seem like the simulation estimate of $b(\lambda)$ is precise enough, but to estimate the efficiency $e(\lambda) = \frac{d \log b(\lambda)}{d \log \lambda}$, it turns out to be much too crude. Indeed, assume that $b(\lambda(1+\varepsilon))$ is estimated as, for example, $0.998 b(\lambda(1 +\varepsilon))$, and $b(\lambda(1-\varepsilon))$ is estimated as $1.002 b(\lambda(1-\varepsilon))$. Then we get the following estimate for $e(\lambda)$:
@@ -244,11 +305,46 @@ So it might seem like the simulation estimate of $b(\lambda)$ is precise enough,
 Taking $\varepsilon = 10^{-4}$ as before gives an estimation error of $\frac{1}{500\varepsilon} = 20$, clearly unacceptable.
  
 \begin{enumerate}
-  \item [$Q_6$]
+  \item [$\boldsymbol{Q}_6$]
   \begin{enumerate}
-    \item [(a)] Use $\log xy = \log x + \log y$ and $\log(1 + x) \approx x$ for small $|x|$, as well as Equation~\ref{eq:approx}, to prove the approximation in Equation~\ref{eq:error}.
-    \item [(b)] Estimate the efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ using simulations. Adapt the script given above to estimate both $b(\lambda(1-\varepsilon))$ and $b(\lambda(1+\varepsilon))$ via $NSim = 10,000$ simulations, and then apply Equation~\ref{eq:approx} to find $e(\lambda)$. Repeat this procedure five times to get five $e(\lambda)$ estimates. How do they compare with the $e(\lambda)$ value we computed in Q3/Q4?
-    \item [(c)] Repeat part (b), but now with $\varepsilon = 0.1$. How do the $e(\lambda)$ estimates compare with the value in Q3/Q4?
+    \item [(a)] Use $\log xy = \log x + \log y$ and $\log(1 + x) \approx x$ for small $|x|$, as well as Equation~\ref{eq:approx}, to prove the approximation in Equation~\ref{eq:error}. \newline
+    A:
+    \item [(b)] Estimate the efficiency $e(\lambda)$ with $\lambda = 0.05$ and $\varepsilon = 0.0001$ using simulations. Adapt the script given above to estimate both $b(\lambda(1-\varepsilon))$ and $b(\lambda(1+\varepsilon))$ via $NSim = 10,000$ simulations, and then apply Equation~\ref{eq:approx} to find $e(\lambda)$. Repeat this procedure five times to get five $e(\lambda)$ estimates. How do they compare with the $e(\lambda)$ value we computed in Q3/Q4? \newline
+    A:
+\begin{lstlisting}
+sim_b <- function(lam_val, NSim=10000, TMax=100) {
+  fbm <- integer(NSim)
+  for (n in 1:NSim) {
+    cn  <- pmin(rpois(TMax, lam_val), 3) + 1L
+    BM  <- 14L
+    for (i in 1:TMax) BM <- Next[cn[i], BM]
+    fbm[n] <- BM
+  }
+  mean(BM.frac[fbm])
+}
+
+sim_e <- function(lam, eps_val, NSim=10000, TMax=100) {
+  lv <- c(lam*(1-eps_val), lam*(1+eps_val))
+  bv <- c(sim_b(lv[1], NSim, TMax),
+          sim_b(lv[2], NSim, TMax))
+  (log(bv[2]) - log(bv[1])) / (log(lv[2]) - log(lv[1]))
+}
+\end{lstlisting}
+\begin{lstlisting}
+> e6b
+[1] 14.85771 19.04268  3.91471 15.81934 14.98137
+> e_rsst
+[1] 0.10304
+\end{lstlisting}
+    
+    \item [(c)] Repeat part (b), but now with $\varepsilon = 0.1$. How do the $e(\lambda)$ estimates compare with the value in Q3/Q4? \newline
+    A:
+\begin{lstlisting}
+> e6c
+[1] 0.1066559 0.0994235 0.1161507 0.0921594 0.0943348
+> e_rsst
+[1] 0.10304
+\end{lstlisting}
   \end{enumerate}
 \end{enumerate}
 
@@ -271,9 +367,30 @@ The management wants an estimate from the actuarial department of the financial 
 \subsection{Waiving the First Claim in Leap Years}
  
 To analyze this modification of the BM-scheme, we have to resort to simulations since the Markov analysis does not apply anymore, with the transition matrix changing every 4 years. For simplicity, we will consider every year divisible by 4 to be a leap year (even though in reality, years divisible by 100 are not leap years, unless they are also divisible by 400). We will also pretend that we are now at the beginning of 2025, so the leap year bonus will apply to years 4, 8, 12, \ldots
- 
+\clearpage
 \begin{enumerate}
-  \item [$Q_7$] Adapt the script provided in Section 4 to compute an estimate for the steady-state premium $b(0.05)$ in the modified BM-scheme. How does the new steady-state premium compare with the original one? (\textit{Hint:} Use again 10,000 simulated claim histories of 100 years, with the same random seed \texttt{set.seed(666)} as in the earlier script. Using the same seed will produce the exact same claim histories, so we can compare the results from the two BM-schemes for the same claim histories. In years 4, 8, 12, \ldots, 100, reduce the number of claims (if positive) by one, by using partial replacement: \texttt{cn[(1:25)*4] <- \ldots cn[(1:25)*4] \ldots})
+  \item [$\boldsymbol{Q}_7$] Adapt the script provided in Section 4 to compute an estimate for the steady-state premium $b(0.05)$ in the modified BM-scheme. How does the new steady-state premium compare with the original one? (\textit{Hint:} Use again 10,000 simulated claim histories of 100 years, with the same random seed \texttt{set.seed(666)} as in the earlier script. Using the same seed will produce the exact same claim histories, so we can compare the results from the two BM-schemes for the same claim histories. In years 4, 8, 12, \ldots, 100, reduce the number of claims (if positive) by one, by using partial replacement: \texttt{cn[(1:25)*4] <- \ldots cn[(1:25)*4] \ldots}) \newline
+  A: 
+\begin{lstlisting}
+NSim <- 10000;  TMax <- 100;  lam <- 0.05
+FinalBM_leap <- integer(NSim)
+for (n in 1:NSim) {
+  cn <- pmin(rpois(TMax, lam), 3) + 1L
+  cn[(1:25)*4] <- pmax(1L, cn[(1:25)*4] - 1L)
+  BM <- 14L
+  for (i in 1:TMax) BM <- Next[cn[i], BM]
+  FinalBM_leap[n] <- BM
+}
+b_leap <- mean(BM.frac[FinalBM_leap])
+\end{lstlisting}
+\begin{lstlisting}
+> b_sim
+[1] 0.325105
+> b_leap
+[1] 0.314527
+> round(100*(b_sim - b_leap)/b_sim, 3)
+[1] 3.254
+\end{lstlisting}
 \end{enumerate}
 \clearpage
 
@@ -284,12 +401,50 @@ In this modification, additional BM classes 15, \ldots, 20 are added to the orig
 Since the Markov chain structure is still maintained (albeit with 20 classes instead of 14), we can get exact results without resorting to simulations.
  
 \begin{enumerate}
-  \item [$Q_8$]
+  \item [$\boldsymbol{Q}_8$]
   \begin{enumerate}
-    \item [(a)] Define a new matrix \texttt{Next20} and a new vector \texttt{BM.frac20} for this extended BM system, analogous to \texttt{Next} and \texttt{BM.frac} defined in Section 1 for the 14-class system.
-    \item [(b)] Define a new function \texttt{FillP20} for this extended BM system, analogous to \texttt{FillP} defined in Section 1.\newline
-    \textit{Hint:} \texttt{FillP20} should produce a $20 \times 20$ matrix instead of $14 \times 14$, and it should use the \texttt{Next20} matrix instead of \texttt{Next}.
-    \item[(c)] Use any technique described in Section 2 or 3 above ($\mathbf{P}^{1024}$, \texttt{eigen()}, RSST) to find the steady-state premium $b(0.05)$ in this extended BM system. How does the new steady-state premium compare with the original one?
+    \item [(a)] Define a new matrix \texttt{Next20} and a new vector \texttt{BM.frac20} for this extended BM system, analogous to \texttt{Next} and \texttt{BM.frac} defined in Section 1 for the 14-class system. \newline
+    A:
+\begin{lstlisting}
+Next20 <- rbind(
+  c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,20),
+  c(1,1,1,1,2,3,4,5, 6, 7, 7, 8, 9,10,11,12,13,14,15,15),
+  c(1,1,1,1,1,1,1,1, 2, 3, 3, 4, 5, 6, 7, 8, 9,10,11,11),
+  c(1,1,1,1,1,1,1,1, 1, 1, 1, 1, 2, 2, 3, 4, 5, 6, 7, 7)
+)
+
+BM.frac20 <- c(120,100,90,80,70,60,55,50,45,40,37.5,35,32.5, rep(30,7)) / 100
+\end{lstlisting}
+    \item [(b)] Define a new function \texttt{FillP20} for this extended BM system, analogous to \texttt{FillP} defined in Section 1.\textit{Hint:} \texttt{FillP20} should produce a $20 \times 20$ matrix instead of $14 \times 14$, and it should use the \texttt{Next20} matrix instead of \texttt{Next}. \newline
+    A:
+\begin{lstlisting}
+FillP20 <- function(p) {
+  PP <- matrix(0, nrow=20, ncol=20)
+  for (b in 1:20)
+    for (k in 1:4)
+      PP[b, Next20[k,b]] <- PP[b, Next20[k,b]] + p[k]
+  return(PP)
+}
+\end{lstlisting} \clearpage
+    \item[(c)] Use any technique described in Section 2 or 3 above ($\mathbf{P}^{1024}$, \texttt{eigen()}, RSST) to find the steady-state premium $b(0.05)$ in this extended BM system. How does the new steady-state premium compare with the original one? \newline
+    A: 
+\begin{lstlisting}
+pp     <- dpois(0:2, 0.05)
+pv     <- c(pp, 1-sum(pp))
+P20    <- FillP20(pv)
+stst20 <- rep(1,20) %*% solve(diag(20) - P20 + matrix(1,20,20))
+stst20 <- as.numeric(stst20) / sum(stst20)
+b_ext  <- sum(stst20 * BM.frac20)
+\end{lstlisting}
+\begin{lstlisting}
+[1] 0.326079
+> b_ext
+[1] 0.301791
+> round(b_ext/b_exact, 5)
+[1] 0.92552
+> round(100*(1 - b_ext/b_exact), 2)
+[1] 7.45
+\end{lstlisting}
   \end{enumerate}
 \end{enumerate}
 \clearpage
@@ -297,7 +452,7 @@ Since the Markov chain structure is still maintained (albeit with 20 classes ins
 We see from the previous question that in the extended system, the steady-state premium $b(0.05)$ drops to about 93\% of its original value. We would also like to see how much the steady-state premium $b(\lambda)$ drops for other $\lambda$ values in the interval $(0, 0.5]$.
  
 \begin{enumerate}
-  \item [$Q_9$]
+  \item [$\boldsymbol{Q}_9$]
   \begin{enumerate}
     \item [(a)] Consider the 100 values $\lambda = 1/200, 2/200, \ldots, 100/200$ in the interval $(0, 0.5]$. Write a loop that computes the steady-state premium $b(\lambda)$ in the original (14-class) BM system as well as the steady-state premium $b^*(\lambda)$ in the extended (20-class) BM system for each of these $\lambda$ values, and store the proportions $b^*(\lambda)/b(\lambda)$ in a vector of length 100 called \texttt{prop}. (You can use any technique described in Section 2 or 3 to compute steady-state premiums.)
  
@@ -308,7 +463,33 @@ We see from the previous question that in the extended system, the steady-state 
       ...
     }
     \end{lstlisting}
-    \item [(b)] Produce a plot of the proportions you computed in part (a) against $\lambda$. Which drivers would benefit most from the adoption of the extended BM system?
+    A:
+\begin{lstlisting}
+lambdas <- 1:100/200
+prop    <- numeric(100)
+
+for (i in 1:100) {
+  la <- lambdas[i]
+  pv <- c(dpois(0:2, la), 1 - sum(dpois(0:2, la)))
+  
+  Pt  <- FillP(pv)
+  st  <- rep(1,14) %*% solve(diag(14) - Pt  + matrix(1,14,14))
+  st  <- as.numeric(st)  / sum(st)
+  
+  P20t <- FillP20(pv)
+  st20 <- rep(1,20) %*% solve(diag(20) - P20t + matrix(1,20,20))
+  st20 <- as.numeric(st20) / sum(st20)
+  
+  prop[i] <- sum(st20 * BM.frac20) / sum(st * BM.frac)
+}
+\end{lstlisting} \clearpage
+    \item [(b)] Produce a plot of the proportions you computed in part (a) against $\lambda$. Which drivers would benefit most from the adoption of the extended BM system? \newline
+    A:
+    \begin{center}
+      \includegraphics[width=0.7\textwidth]{Assignment 5 Q9b.png}
+    \end{center}
+    The ratio is lowest ($\approx$ 0.816) around $\lambda$ = 0.15. Drivers with an intermediate claim frequency (about 1 claim every 6-7 years) benefit most: they file occasional claims so cannot easily stay at class 14 in the original system, but with the bonus guarantee they can reach classes 15-20 and recover there after a claim. Very low-$\lambda$ drivers already sit permanently at class 14 (little to gain). Very high-$\lambda$ drivers claim so often that the extra classes offer little shelter.
+
   \end{enumerate}
 \end{enumerate}
 \end{document}
